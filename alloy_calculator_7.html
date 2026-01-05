@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vintage Story Alloy Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.8;
+            font-size: 1.1em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+        }
+
+        .sidebar {
+            background: #f7fafc;
+            padding: 30px;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .results-area {
+            padding: 30px;
+        }
+
+        .alloy-select {
+            margin-bottom: 30px;
+        }
+
+        .alloy-select label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        select, input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .mode-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .mode-tab:hover {
+            border-color: #667eea;
+        }
+
+        .mode-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        .constraint-inputs {
+            display: grid;
+            gap: 15px;
+        }
+
+        .component-constraint {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .component-constraint h4 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .priority-slider {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 6px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .slider-group {
+            margin-bottom: 15px;
+        }
+
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        input[type="range"] {
+            width: 100%;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results-header {
+            margin-bottom: 20px;
+        }
+
+        .results-header h2 {
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .no-results h3 {
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: #2d3748;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover {
+            background: #f7fafc;
+        }
+
+        .best-recipe {
+            background: #c6f6d5 !important;
+            font-weight: 600;
+        }
+
+        .efficiency-score {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #667eea;
+            color: white;
+            border-radius: 4px;
+            font-size: 0.85em;
+        }
+
+        .alloy-info {
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .alloy-info h4 {
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid #e2e8f0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚒️ Vintage Story Alloy Calculator</h1>
+            <p class="subtitle">Optimize your alloy recipes with constraint-based calculations</p>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="alloy-select">
+                    <label for="alloyType">Select Alloy Type:</label>
+                    <select id="alloyType">
+                        <option value="bismuth">Bismuth Bronze</option>
+                        <option value="black">Black Bronze</option>
+                        <option value="tin">Tin Bronze</option>
+                        <option value="brass">Brass</option>
+                        <option value="leadsolder">Lead Solder</option>
+                        <option value="molybdochalkos">Molybdochalkos</option>
+                        <option value="silversolder">Silver Solder</option>
+                        <option value="electrum">Electrum</option>
+                        <option value="cupronickel">Cupronickel</option>
+                    </select>
+                </div>
+
+                <div id="alloyInfo" class="alloy-info"></div>
+
+                <div class="mode-tabs">
+                    <div class="mode-tab active" data-mode="inventory">
+                        Inventory Mode
+                    </div>
+                    <div class="mode-tab" data-mode="target">
+                        Target Mode
+                    </div>
+                </div>
+
+                <div id="inventoryMode" class="mode-content">
+                    <div class="input-group">
+                        <label>Component Inventory:</label>
+                        <div class="constraint-inputs" id="inventoryInputs"></div>
+                    </div>
+
+                    <div class="priority-slider">
+                        <h4 style="margin-bottom: 10px;">Optimization Priority:</h4>
+                        <p style="font-size: 0.85em; color: #718096; margin-bottom: 15px;">
+                            Higher values conserve that material (minimize its use). Set to 0 to use freely, 1 to maximize conservation. Efficiency = yield / weighted material cost.
+                        </p>
+                        <div id="prioritySliders"></div>
+                    </div>
+                </div>
+
+                <div id="targetMode" class="mode-content" style="display: none;">
+                    <div class="input-group">
+                        <label for="targetAmount">Target Alloy Amount:</label>
+                        <input type="number" id="targetAmount" min="1" value="100" step="5">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Component Constraints (optional):</label>
+                        <div class="constraint-inputs" id="targetInputs"></div>
+                    </div>
+
+                    <div class="priority-slider">
+                        <h4 style="margin-bottom: 10px;">Optimization Priority:</h4>
+                        <p style="font-size: 0.85em; color: #718096; margin-bottom: 15px;">
+                            Higher values conserve that material (minimize its use). Set to 0 to use freely, 1 to maximize conservation. Efficiency = yield / weighted material cost.
+                        </p>
+                        <div id="targetPrioritySliders"></div>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculate()">Calculate Recipes</button>
+            </div>
+
+            <div class="results-area">
+                <div class="results-header">
+                    <h2>Results</h2>
+                    <p id="resultsSubtitle">Configure parameters and click Calculate</p>
+                </div>
+                <div id="results">
+                    <div class="no-results">
+                        <h3>No results yet</h3>
+                        <p>Adjust your parameters and click Calculate to see available recipes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ALLOYS = {
+            bismuth: {
+                name: "Bismuth Bronze",
+                components: [
+                    { name: "Copper", min: 50, max: 70 },
+                    { name: "Sphalerite", min: 20, max: 30 },
+                    { name: "Bismuthinite", min: 10, max: 20 }
+                ],
+                unitsPerNugget: 5
+            },
+            black: {
+                name: "Black Bronze",
+                components: [
+                    { name: "Copper", min: 68, max: 84 },
+                    { name: "Silver", min: 8, max: 16 },
+                    { name: "Gold", min: 8, max: 16 }
+                ],
+                unitsPerNugget: 5
+            },
+            tin: {
+                name: "Tin Bronze",
+                components: [
+                    { name: "Copper", min: 88, max: 92 },
+                    { name: "Tin", min: 8, max: 12 }
+                ],
+                unitsPerNugget: 5
+            },
+            brass: {
+                name: "Brass",
+                components: [
+                    { name: "Copper", min: 60, max: 70 },
+                    { name: "Zinc", min: 30, max: 40 }
+                ],
+                unitsPerNugget: 5
+            },
+            leadsolder: {
+                name: "Lead Solder",
+                components: [
+                    { name: "Lead", min: 45, max: 55 },
+                    { name: "Tin", min: 45, max: 55 }
+                ],
+                unitsPerNugget: 5
+            },
+            molybdochalkos: {
+                name: "Molybdochalkos",
+                components: [
+                    { name: "Copper", min: 8, max: 12 },
+                    { name: "Lead", min: 88, max: 92 }
+                ],
+                unitsPerNugget: 5
+            },
+            silversolder: {
+                name: "Silver Solder",
+                components: [
+                    { name: "Silver", min: 40, max: 50 },
+                    { name: "Tin", min: 50, max: 60 }
+                ],
+                unitsPerNugget: 5
+            },
+            electrum: {
+                name: "Electrum",
+                components: [
+                    { name: "Gold", min: 40, max: 60 },
+                    { name: "Silver", min: 40, max: 60 }
+                ],
+                unitsPerNugget: 5
+            },
+            cupronickel: {
+                name: "Cupronickel",
+                components: [
+                    { name: "Copper", min: 65, max: 75 },
+                    { name: "Nickel", min: 25, max: 35 }
+                ],
+                unitsPerNugget: 5
+            }
+        };
+
+        let currentAlloy = 'bismuth';
+        let currentMode = 'inventory';
+        let inventoryPriorities = {};
+        let targetPriorities = {};
+
+        function initApp() {
+            updateAlloyInfo();
+            updateInputs();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            document.getElementById('alloyType').addEventListener('change', (e) => {
+                currentAlloy = e.target.value;
+                updateAlloyInfo();
+                updateInputs();
+            });
+
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const mode = e.target.dataset.mode;
+                    switchMode(mode);
+                });
+            });
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+
+            document.getElementById('inventoryMode').style.display = mode === 'inventory' ? 'block' : 'none';
+            document.getElementById('targetMode').style.display = mode === 'target' ? 'block' : 'none';
+        }
+
+        function updateAlloyInfo() {
+            const alloy = ALLOYS[currentAlloy];
+            const info = document.getElementById('alloyInfo');
+            
+            let html = `<h4>${alloy.name}</h4>`;
+            html += `<p><strong>Composition ranges:</strong></p>`;
+            html += `<ul style="margin-left: 20px; margin-top: 5px;">`;
+            alloy.components.forEach(comp => {
+                html += `<li>${comp.name}: ${comp.min}-${comp.max}%</li>`;
+            });
+            html += `</ul>`;
+            html += `<p style="margin-top: 8px;"><strong>1 nugget = ${alloy.unitsPerNugget} units</strong></p>`;
+            
+            info.innerHTML = html;
+        }
+
+        function updateInputs() {
+            const alloy = ALLOYS[currentAlloy];
+            
+            // Inventory mode inputs
+            let inventoryHtml = '';
+            alloy.components.forEach(comp => {
+                inventoryHtml += `
+                    <div class="component-constraint">
+                        <h4>${comp.name}</h4>
+                        <label>Available nuggets:</label>
+                        <input type="number" id="inv_${comp.name}" min="0" value="20" step="1">
+                    </div>
+                `;
+            });
+            document.getElementById('inventoryInputs').innerHTML = inventoryHtml;
+
+            // Target mode inputs
+            let targetHtml = '';
+            alloy.components.forEach(comp => {
+                targetHtml += `
+                    <div class="component-constraint">
+                        <h4>${comp.name}</h4>
+                        <label>Max nuggets (leave empty for no limit):</label>
+                        <input type="number" id="tgt_${comp.name}" min="0" placeholder="No limit">
+                    </div>
+                `;
+            });
+            document.getElementById('targetInputs').innerHTML = targetHtml;
+
+            // Inventory Priority sliders
+            let invSliderHtml = '';
+            alloy.components.forEach(comp => {
+                inventoryPriorities[comp.name] = 0.5;
+                invSliderHtml += `
+                    <div class="slider-group">
+                        <label>
+                            <span>${comp.name}</span>
+                            <span id="inv_priority_${comp.name}_val">0.5</span>
+                        </label>
+                        <input type="range" id="inv_priority_${comp.name}" min="0" max="1" step="0.1" value="0.5"
+                               oninput="updatePriority('inventory', '${comp.name}', this.value)">
+                    </div>
+                `;
+            });
+            document.getElementById('prioritySliders').innerHTML = invSliderHtml;
+
+            // Target Priority sliders
+            let tgtSliderHtml = '';
+            alloy.components.forEach(comp => {
+                targetPriorities[comp.name] = 0.5;
+                tgtSliderHtml += `
+                    <div class="slider-group">
+                        <label>
+                            <span>${comp.name}</span>
+                            <span id="tgt_priority_${comp.name}_val">0.5</span>
+                        </label>
+                        <input type="range" id="tgt_priority_${comp.name}" min="0" max="1" step="0.1" value="0.5"
+                               oninput="updatePriority('target', '${comp.name}', this.value)">
+                    </div>
+                `;
+            });
+            document.getElementById('targetPrioritySliders').innerHTML = tgtSliderHtml;
+        }
+
+        function updatePriority(mode, name, value) {
+            const priorities = mode === 'inventory' ? inventoryPriorities : targetPriorities;
+            priorities[name] = parseFloat(value);
+            document.getElementById(`${mode === 'inventory' ? 'inv' : 'tgt'}_priority_${name}_val`).textContent = value;
+        }
+
+        function calculate() {
+            const alloy = ALLOYS[currentAlloy];
+            let recipes = [];
+
+            if (currentMode === 'inventory') {
+                recipes = calculateInventoryMode(alloy);
+            } else {
+                recipes = calculateTargetMode(alloy);
+            }
+
+            displayResults(recipes, alloy);
+        }
+
+        function calculateInventoryMode(alloy) {
+            const inventory = {};
+            alloy.components.forEach(comp => {
+                const value = parseInt(document.getElementById(`inv_${comp.name}`).value) || 0;
+                inventory[comp.name] = value;
+            });
+
+            const recipes = [];
+            const unitsPerNugget = alloy.unitsPerNugget;
+
+            // Generate all valid combinations within inventory limits
+            function generateCombinations(componentIndex, currentCombo) {
+                if (componentIndex === alloy.components.length) {
+                    // Check if this combination is valid
+                    const total = Object.values(currentCombo).reduce((sum, val) => sum + val, 0);
+                    if (total === 0) return;
+
+                    const percentages = {};
+                    alloy.components.forEach(comp => {
+                        percentages[comp.name] = (currentCombo[comp.name] / total) * 100;
+                    });
+
+                    // Check if percentages are within range
+                    const valid = alloy.components.every(comp => {
+                        const pct = percentages[comp.name];
+                        return pct >= comp.min && pct <= comp.max;
+                    });
+
+                    if (valid) {
+                        const totalUnits = total * unitsPerNugget;
+                        const efficiency = calculateEfficiency(currentCombo, alloy, 'inventory');
+                        recipes.push({
+                            ...currentCombo,
+                            total,
+                            totalUnits,
+                            percentages,
+                            efficiency
+                        });
+                    }
+                    return;
+                }
+
+                const comp = alloy.components[componentIndex];
+                const maxNuggets = inventory[comp.name];
+
+                for (let i = 0; i <= maxNuggets; i++) {
+                    generateCombinations(componentIndex + 1, { ...currentCombo, [comp.name]: i });
+                }
+            }
+
+            const initialCombo = {};
+            alloy.components.forEach(comp => initialCombo[comp.name] = 0);
+            generateCombinations(0, initialCombo);
+
+            // Sort by efficiency first (descending), then by total yield (descending) for ties
+            recipes.sort((a, b) => {
+                if (Math.abs(a.efficiency - b.efficiency) < 0.0001) {
+                    // If efficiency is equal (within rounding), sort by total yield
+                    return b.totalUnits - a.totalUnits;
+                }
+                return b.efficiency - a.efficiency;
+            });
+
+            return recipes.slice(0, 50); // Limit to top 50 results
+        }
+
+        function calculateTargetMode(alloy) {
+            const targetUnits = parseInt(document.getElementById('targetAmount').value) || 0;
+            const targetNuggets = targetUnits / alloy.unitsPerNugget;
+
+            if (!Number.isInteger(targetNuggets)) {
+                alert(`Target amount must be a multiple of ${alloy.unitsPerNugget}`);
+                return [];
+            }
+
+            const constraints = {};
+            alloy.components.forEach(comp => {
+                const value = parseInt(document.getElementById(`tgt_${comp.name}`).value);
+                constraints[comp.name] = isNaN(value) ? Infinity : value;
+            });
+
+            const recipes = [];
+            const unitsPerNugget = alloy.unitsPerNugget;
+
+            // Generate combinations that sum to target
+            function generateCombinations(componentIndex, currentCombo, remaining) {
+                if (componentIndex === alloy.components.length - 1) {
+                    // Last component - it must equal remaining
+                    const lastComp = alloy.components[componentIndex];
+                    const lastValue = remaining;
+
+                    if (lastValue < 0 || lastValue > constraints[lastComp.name]) return;
+
+                    currentCombo[lastComp.name] = lastValue;
+
+                    // Check percentages
+                    const percentages = {};
+                    alloy.components.forEach(comp => {
+                        percentages[comp.name] = (currentCombo[comp.name] / targetNuggets) * 100;
+                    });
+
+                    const valid = alloy.components.every(comp => {
+                        const pct = percentages[comp.name];
+                        return pct >= comp.min && pct <= comp.max;
+                    });
+
+                    if (valid) {
+                        const efficiency = calculateEfficiency(currentCombo, alloy, 'target');
+                        recipes.push({
+                            ...currentCombo,
+                            total: targetNuggets,
+                            totalUnits: targetUnits,
+                            percentages,
+                            efficiency
+                        });
+                    }
+                    return;
+                }
+
+                const comp = alloy.components[componentIndex];
+                const maxForThisComponent = Math.min(remaining, constraints[comp.name]);
+
+                for (let i = 0; i <= maxForThisComponent; i++) {
+                    generateCombinations(componentIndex + 1, { ...currentCombo, [comp.name]: i }, remaining - i);
+                }
+            }
+
+            const initialCombo = {};
+            generateCombinations(0, initialCombo, targetNuggets);
+
+            // Sort by efficiency first (descending), then by total yield (descending) for ties
+            recipes.sort((a, b) => {
+                if (Math.abs(a.efficiency - b.efficiency) < 0.0001) {
+                    // If efficiency is equal (within rounding), sort by total yield
+                    return b.totalUnits - a.totalUnits;
+                }
+                return b.efficiency - a.efficiency;
+            });
+
+            return recipes;
+        }
+
+        function calculateEfficiency(combo, alloy, mode) {
+            // Efficiency = total_yield / weighted_component_usage
+            // Higher priority means component is more "expensive" (counts more against efficiency)
+            // Priority = 0 means component is "free" (doesn't count against efficiency)
+            const priorities = mode === 'inventory' ? inventoryPriorities : targetPriorities;
+            
+            const total = Object.values(combo).reduce((sum, val) => sum + val, 0);
+            if (total === 0) return 0;
+            
+            const totalUnits = total * alloy.unitsPerNugget;
+            
+            // Calculate weighted component usage
+            let weightedUsage = 0;
+            alloy.components.forEach(comp => {
+                const priority = (comp.name in priorities) ? priorities[comp.name] : 0.5;
+                weightedUsage += combo[comp.name] * priority;
+            });
+            
+            // Avoid division by zero - if all priorities are 0, just use total yield
+            if (weightedUsage === 0) {
+                return totalUnits;
+            }
+            
+            return totalUnits / weightedUsage;
+        }
+
+        function displayResults(recipes, alloy) {
+            const resultsDiv = document.getElementById('results');
+            const subtitle = document.getElementById('resultsSubtitle');
+
+            if (recipes.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <h3>No valid recipes found</h3>
+                        <p>Try adjusting your constraints or target amount</p>
+                    </div>
+                `;
+                subtitle.textContent = 'No valid recipes';
+                return;
+            }
+
+            subtitle.textContent = `Found ${recipes.length} valid recipe${recipes.length > 1 ? 's' : ''}`;
+
+            let html = '<table>';
+            html += '<thead><tr>';
+            html += '<th>Rank</th>';
+            alloy.components.forEach(comp => {
+                html += `<th>${comp.name} (nuggets)</th>`;
+            });
+            html += '<th>Total Nuggets</th>';
+            html += '<th>Total Units</th>';
+            alloy.components.forEach(comp => {
+                html += `<th>${comp.name} %</th>`;
+            });
+            html += '<th>Efficiency</th>';
+            html += '</tr></thead>';
+            html += '<tbody>';
+
+            recipes.forEach((recipe, index) => {
+                const rowClass = index === 0 ? 'best-recipe' : '';
+                html += `<tr class="${rowClass}">`;
+                html += `<td>${index + 1}${index === 0 ? ' 🏆' : ''}</td>`;
+                alloy.components.forEach(comp => {
+                    html += `<td>${recipe[comp.name]}</td>`;
+                });
+                html += `<td>${recipe.total}</td>`;
+                html += `<td>${recipe.totalUnits}</td>`;
+                alloy.components.forEach(comp => {
+                    html += `<td>${recipe.percentages[comp.name].toFixed(1)}%</td>`;
+                });
+                html += `<td><span class="efficiency-score">${recipe.efficiency.toFixed(1)}</span></td>`;
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            resultsDiv.innerHTML = html;
+        }
+
+        // Initialize on load
+        initApp();
+    </script>
+</body>
+</html>
